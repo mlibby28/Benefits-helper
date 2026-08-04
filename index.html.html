@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odyssey Community School — Benefits Helper</title>
+<style>
+  :root{
+    --brand:#0072B8; --brand-dark:#00598F; --brand-light:#D9EFF8;
+    --ink:#1c2733; --ink-soft:#425466; --muted:#6b7c8c; --line:#dbe3e9; --white:#fff; --ok:#1e7f4f;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#eef2f5;color:var(--ink);font-family:"Source Sans Pro","Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5;}
+  h1,h2,h3,.serif{font-family:Georgia,"Times New Roman",serif;}
+  .wrap{max-width:1080px;margin:0 auto;padding:22px 20px 60px;}
+
+  .top{background:var(--brand);color:#fff;border-radius:14px;padding:22px 26px;position:relative;overflow:hidden;}
+  .top::after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.07);top:-90px;right:-60px;}
+  .brandmark .mdg{font-family:Georgia,serif;font-weight:700;font-size:22px;line-height:1;}
+  .brandmark .rule{height:2.5px;width:74px;background:#fff;opacity:.85;margin:5px 0 4px;}
+  .brandmark .sub{text-transform:uppercase;letter-spacing:.24em;font-size:8.5px;color:#dceefb;font-weight:600;}
+  .top h1{font-size:26px;margin:16px 0 3px;}
+  .top p{margin:0;color:#dceefb;font-size:13.5px;max-width:660px;}
+  .yearstamp{position:absolute;top:20px;right:24px;font-size:10.5px;letter-spacing:.06em;color:#cfe6f7;text-transform:uppercase;z-index:2;text-align:right;}
+
+  /* stepper */
+  .steps-nav{display:flex;gap:8px;margin:18px 0 6px;flex-wrap:wrap;}
+  .pill{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:20px;padding:7px 14px;}
+  .pill .n{width:20px;height:20px;border-radius:50%;background:#e3eaef;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+  .pill.on{color:var(--brand-dark);border-color:var(--brand);}
+  .pill.on .n{background:var(--brand);color:#fff;}
+  .pill.done .n{background:var(--ok);color:#fff;}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .card h2{font-size:20px;margin:0 0 4px;color:var(--brand-dark);}
+  .card .sub{font-size:13px;color:var(--muted);margin:0 0 16px;}
+  .eyebrow{text-transform:uppercase;letter-spacing:.08em;font-size:10px;font-weight:700;color:var(--brand);}
+  .hide{display:none;}
+
+  /* questions */
+  .q{margin-bottom:22px;}
+  .q .qt{font-weight:700;font-size:15.5px;margin-bottom:3px;}
+  .q .qh{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
+  .choices{display:grid;gap:9px;}
+  .choices.two{grid-template-columns:1fr 1fr;}
+  @media(max-width:640px){.choices.two{grid-template-columns:1fr;}}
+  .choice{display:flex;align-items:center;gap:11px;border:1.5px solid var(--line);border-radius:10px;padding:12px 15px;cursor:pointer;transition:.15s;font-size:14px;}
+  .choice:hover{border-color:var(--brand);background:#f6fbfe;}
+  .choice.sel{border-color:var(--brand);background:var(--brand-light);}
+  .choice .radio{width:19px;height:19px;border-radius:50%;border:2px solid #b9c6d0;flex:0 0 auto;position:relative;}
+  .choice.sel .radio{border-color:var(--brand);}
+  .choice.sel .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--brand);}
+  .choice .cx{width:19px;height:19px;border-radius:5px;border:2px solid #b9c6d0;flex:0 0 auto;position:relative;}
+  .choice.sel .cx{border-color:var(--brand);background:var(--brand);}
+  .choice.sel .cx::after{content:"✓";position:absolute;inset:0;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+
+  .btnrow{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;}
+  .btn{border:none;border-radius:10px;padding:12px 22px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn.primary{background:var(--brand);color:#fff;}
+  .btn.primary:hover{background:var(--brand-dark);}
+  .btn.primary:disabled{background:#b9c6d0;cursor:not-allowed;}
+  .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink-soft);}
+  .btn.ghost:hover{border-color:var(--brand);color:var(--brand-dark);}
+
+  /* recommendation cards */
+  .rec{border:1.5px solid var(--brand-light);background:#f7fbfe;border-radius:12px;padding:15px 17px;margin-bottom:12px;}
+  .rec .rh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+  .rec .plan{font-weight:700;color:var(--brand-dark);font-size:15px;}
+  .rec .pick{font-family:Georgia,serif;font-weight:700;color:var(--brand);font-size:15px;text-align:right;}
+  .rec .why{font-size:12.5px;color:var(--ink-soft);margin-top:5px;}
+  .rec.muted{border-color:var(--line);background:#fafbfc;}
+  .rec.muted .plan,.rec.muted .pick{color:var(--ink-soft);}
+
+  /* estimator */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start;}
+  @media(max-width:860px){.grid{grid-template-columns:1fr;}}
+  .paybar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+  .paybar .lbl{font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:11px;color:var(--brand-dark);}
+  .seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:4px;gap:4px;}
+  .seg button{border:none;background:transparent;padding:9px 15px;border-radius:7px;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;}
+  .seg button.on{background:var(--brand);color:#fff;}
+
+  .opts{display:grid;gap:10px;}
+  .opt{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1.5px solid var(--line);border-radius:10px;padding:12px 15px;cursor:pointer;transition:.15s;}
+  .opt:hover{border-color:var(--brand);background:#f6fbfe;}
+  .opt.sel{border-color:var(--brand);background:var(--brand-light);}
+  .opt.rec-flag{box-shadow:0 0 0 2px var(--brand-light);}
+  .opt .left{display:flex;align-items:center;gap:12px;}
+  .radioo{width:20px;height:20px;border-radius:50%;border:2px solid #b9c6d0;flex:0 0 auto;position:relative;}
+  .opt.sel .radioo{border-color:var(--brand);}
+  .opt.sel .radioo::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--brand);}
+  .opt .tname{font-weight:600;}
+  .opt .tag{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--brand);background:var(--brand-light);border-radius:5px;padding:2px 6px;margin-left:8px;}
+  .opt .cost{text-align:right;}
+  .opt .cost .pp{font-family:Georgia,serif;font-weight:700;color:var(--brand-dark);font-size:17px;}
+  .opt .cost .u{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+
+  .money-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #eef1f4;}
+  .money-row:last-child{border-bottom:none;}
+  .money-row .info{max-width:60%;}
+  .money-row .info .t{font-weight:600;}
+  .money-row .info .d{font-size:12px;color:var(--muted);}
+  .rec-inline{font-size:11.5px;color:var(--brand-dark);font-weight:600;margin-top:3px;}
+  .input-money{position:relative;}
+  .input-money span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;}
+  .input-money input{width:128px;padding:9px 11px 9px 22px;border:1.5px solid var(--line);border-radius:9px;font:inherit;font-size:14px;text-align:right;}
+  .input-money input:focus{outline:none;border-color:var(--brand);}
+  .cap-note{font-size:11px;color:#b26a00;margin-top:5px;display:none;}
+  .cap-note.show{display:block;}
+  .hint{font-size:11px;color:var(--muted);margin-top:8px;}
+
+  .included{display:flex;align-items:center;gap:10px;background:#f2f8f4;border:1px solid #cfe6d8;border-radius:10px;padding:11px 14px;font-size:12.5px;color:#245c40;margin-bottom:9px;}
+  .chip-emp{background:#eef7f1;color:var(--ok);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap;}
+
+  .rail{position:sticky;top:18px;}
+  .rail .card{padding:0;overflow:hidden;}
+  .rail-head{background:var(--brand-dark);color:#fff;padding:16px 20px;}
+  .rail-head .eyebrow{color:#bfe0f5;}
+  .rail-head h2{color:#fff;font-size:19px;margin:3px 0 0;}
+  .rail-body{padding:16px 20px;}
+  .line{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #eef1f4;font-size:13.5px;}
+  .line .nm{color:var(--ink-soft);} .line .amt{font-weight:600;white-space:nowrap;}
+  .line.zero .amt{color:var(--muted);font-weight:400;}
+  .total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:12px;padding-top:14px;border-top:2px solid var(--brand-dark);}
+  .total .nm{font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:12px;color:var(--brand-dark);}
+  .total .amt{font-family:Georgia,serif;font-weight:700;font-size:26px;color:var(--brand-dark);}
+  .subtotal{font-size:12px;color:var(--muted);text-align:right;margin-top:2px;}
+  .employer-box{background:var(--brand-light);border-radius:10px;padding:12px 14px;margin-top:16px;font-size:12.5px;color:var(--brand-dark);}
+  .employer-box .h{font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:10px;margin-bottom:3px;}
+  .employer-box .v{font-family:Georgia,serif;font-weight:700;font-size:17px;}
+  .reset{margin-top:14px;width:100%;border:1px solid var(--line);background:#fff;color:var(--ink-soft);padding:10px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer;}
+  .reset:hover{border-color:var(--brand);color:var(--brand-dark);}
+  .disc{font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .foot{margin-top:18px;font-size:11px;color:var(--muted);text-align:center;}
+
+  /* password gate */
+  #gate{position:fixed;inset:0;background:#eef2f5;display:flex;align-items:center;justify-content:center;padding:20px;z-index:999;}
+  #gate .box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:32px 28px;max-width:360px;width:100%;text-align:center;box-shadow:0 6px 24px rgba(28,39,51,.08);}
+  #gate .brandmark{margin-bottom:14px;}
+  #gate .mdg{font-family:Georgia,serif;font-weight:700;font-size:20px;color:var(--brand-dark);}
+  #gate .rule{height:2.5px;width:60px;background:var(--brand);opacity:.85;margin:5px auto 4px;}
+  #gate .sub{text-transform:uppercase;letter-spacing:.24em;font-size:8.5px;color:var(--muted);font-weight:600;}
+  #gate h2{font-size:17px;margin:14px 0 6px;color:var(--ink);}
+  #gate p{font-size:12.5px;color:var(--muted);margin:0 0 16px;}
+  #gate input{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:9px;font:inherit;font-size:14px;text-align:center;margin-bottom:10px;}
+  #gate input:focus{outline:none;border-color:var(--brand);}
+  #gate button{width:100%;border:none;border-radius:10px;padding:12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;background:var(--brand);color:#fff;}
+  #gate button:hover{background:var(--brand-dark);}
+  #gate .err{font-size:12px;color:#b3261e;margin-top:10px;display:none;}
+  #gate .err.show{display:block;}
+  .hide{display:none !important;}
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="box">
+    <div class="brandmark"><div class="mdg">MDG</div><div class="rule"></div><div class="sub">Benefit Solutions</div></div>
+    <h2>Odyssey Community School — Benefits Helper</h2>
+    <p>This tool is for Odyssey Community School employees. Enter the access code you were given to continue.</p>
+    <input id="gateInput" type="password" placeholder="Access code" autocomplete="off">
+    <button id="gateBtn" onclick="checkGate()">Continue</button>
+    <div class="err" id="gateErr">That code doesn't match — please try again.</div>
+  </div>
+</div>
+<div class="wrap hide" id="mainWrap">
+
+  <div class="top">
+    <div class="yearstamp">2026–2027 Plan Year<br>For estimation only</div>
+    <div class="brandmark"><div class="mdg">MDG</div><div class="rule"></div><div class="sub">Benefit Solutions</div></div>
+    <h1>Benefits Helper</h1>
+    <p>Odyssey Community School. Answer a few quick questions and we'll suggest a starting point for your benefits — then fine-tune your choices and see the estimated cost update live.</p>
+  </div>
+
+  <div class="steps-nav">
+    <div class="pill on" id="pill1"><span class="n">1</span> A few questions</div>
+    <div class="pill" id="pill2"><span class="n">2</span> Your suggestion</div>
+    <div class="pill" id="pill3"><span class="n">3</span> Review &amp; cost</div>
+  </div>
+
+  <!-- ================= STEP 1: QUESTIONS ================= -->
+  <div id="step1">
+    <div class="card">
+      <div class="eyebrow">Step 1</div>
+      <h2>Tell us a little about your situation</h2>
+      <p class="sub">Your answers stay on this device — nothing is saved or sent anywhere.</p>
+
+      <div class="q">
+        <div class="qt">Who do you need to cover?</div>
+        <div class="qh">This sets your medical and dental coverage level.</div>
+        <div class="choices" id="qWho">
+          <div class="choice" data-v="EE"><span class="radio"></span> Just me</div>
+          <div class="choice" data-v="ES"><span class="radio"></span> Me + my spouse or partner</div>
+          <div class="choice" data-v="EC"><span class="radio"></span> Me + my child(ren)</div>
+          <div class="choice" data-v="FAM"><span class="radio"></span> My whole family (spouse/partner + children)</div>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="qt">How would you describe your typical health care use?</div>
+        <div class="qh">Helps us suggest how to use the HSA that comes with the plan.</div>
+        <div class="choices two" id="qUse">
+          <div class="choice" data-v="low"><span class="radio"></span> Mostly preventive — I rarely visit the doctor</div>
+          <div class="choice" data-v="save"><span class="radio"></span> I'd like to save tax-free for the future</div>
+          <div class="choice" data-v="some"><span class="radio"></span> A few visits or prescriptions a year</div>
+          <div class="choice" data-v="high"><span class="radio"></span> Ongoing care or expenses I can plan for</div>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="qt">Do any of these apply to you? <span style="font-weight:400;color:var(--muted);font-size:12.5px;">(choose any)</span></div>
+        <div class="choices" id="qMulti">
+          <div class="choice" data-v="dc"><span class="cx"></span> I pay for child or dependent care so I can work</div>
+          <div class="choice" data-v="dv"><span class="cx"></span> I expect dental or vision costs (braces, glasses, contacts)</div>
+          <div class="choice" data-v="dep"><span class="cx"></span> Other people depend on my income</div>
+        </div>
+      </div>
+
+      <div class="btnrow">
+        <button class="btn primary" id="toStep2" disabled onclick="goStep2()">See my suggestion →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= STEP 2: RECOMMENDATION ================= -->
+  <div id="step2" class="hide">
+    <div class="card">
+      <div class="eyebrow">Step 2</div>
+      <h2>Here's a suggested starting point</h2>
+      <p class="sub">Based on your answers. These are suggestions to get you going — adjust anything you like in the next step.</p>
+      <div id="recList"></div>
+      <div class="btnrow">
+        <button class="btn ghost" onclick="goStep1()">← Back</button>
+        <button class="btn primary" onclick="goStep3()">Review &amp; see cost →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= STEP 3: ESTIMATOR ================= -->
+  <div id="step3" class="hide">
+    <div class="paybar">
+      <span class="lbl">I am paid as a</span>
+      <div class="seg" role="group" aria-label="Pay group">
+        <button id="g12" class="on" onclick="setGroup(12)">12-month · 26 checks</button>
+        <button id="g10" onclick="setGroup(10)">10-month · 21 checks</button>
+      </div>
+      <button class="btn ghost" style="margin-left:auto;padding:8px 16px;" onclick="goStep2()">← Back to suggestion</button>
+    </div>
+
+    <div class="grid">
+      <div class="col-main">
+        <div class="card">
+          <div class="eyebrow">Medical</div>
+          <h2>Anthem Century Preferred PPO HSA $3,000</h2>
+          <p class="sub">High-Deductible Health Plan · pairs with an HSA · employee share 17.5%</p>
+          <div class="opts" id="medOpts"></div>
+        </div>
+        <div class="card">
+          <div class="eyebrow">Dental</div>
+          <h2>Anthem Dental Essential Choice</h2>
+          <p class="sub">Dental Complete Network · employee share 50%</p>
+          <div class="opts" id="denOpts"></div>
+        </div>
+        <div class="card">
+          <div class="eyebrow">Tax-Advantaged Accounts</div>
+          <h2>HSA &amp; Spending Accounts</h2>
+          <p class="sub">Enter the annual amount you'd like to set aside; it's spread across your paychecks.</p>
+          <div class="money-row">
+            <div class="info"><div class="t">Health Savings Account (HSA)</div><div class="d">Pre-tax. 2026 IRS max $4,400 single / $8,750 family, incl. the employer's $1,000.</div><div class="rec-inline hide" id="recHsa"></div></div>
+            <div><div class="input-money"><span>$</span><input id="hsa" type="number" min="0" step="50" value="0" inputmode="numeric"></div><div class="cap-note" id="hsaCap"></div></div>
+          </div>
+          <div class="money-row">
+            <div class="info"><div class="t">Dependent Care FSA</div><div class="d">Pre-tax dependent care. 2026 limit $7,500.</div><div class="rec-inline hide" id="recDc"></div></div>
+            <div><div class="input-money"><span>$</span><input id="dcfsa" type="number" min="0" max="7500" step="50" value="0" inputmode="numeric"></div><div class="cap-note" id="dcCap">Capped at the $7,500 annual limit.</div></div>
+          </div>
+          <div class="money-row">
+            <div class="info"><div class="t">Limited-Purpose Health FSA</div><div class="d">Pre-tax dental &amp; vision only. Confirm the current IRS limit with HR.</div><div class="rec-inline hide" id="recLp"></div></div>
+            <div class="input-money"><span>$</span><input id="lpfsa" type="number" min="0" step="50" value="0" inputmode="numeric"></div>
+          </div>
+          <div class="hint">These are your own pre-tax dollars — not an insurance premium.</div>
+        </div>
+        <div class="card">
+          <div class="eyebrow">Included at No Cost</div>
+          <h2>Employer-Paid Coverage</h2>
+          <p class="sub">Provided through Equitable — automatically included for eligible employees.</p>
+          <div class="included"><span class="chip-emp">$0</span><div><b>Basic Life &amp; AD&amp;D</b> — $50,000 flat, employee only.</div></div>
+          <div class="included"><span class="chip-emp">$0</span><div><b>Short-Term Disability</b> — 60% of pay to $1,000/wk, day 15, up to 11 weeks.</div></div>
+          <div class="included"><span class="chip-emp">$0</span><div><b>Long-Term Disability</b> — 60% of pay to $5,000/mo after 90 days.</div></div>
+          <div class="hint" id="volLifeHint">Voluntary Life &amp; AD&amp;D is available at employee cost — premiums are age-based and quoted in Paylocity, so they aren't part of this estimate.</div>
+        </div>
+      </div>
+
+      <div class="col-rail">
+        <div class="rail">
+          <div class="card">
+            <div class="rail-head"><div class="eyebrow">Your Estimate</div><h2 id="railGroup">12-month · per paycheck</h2></div>
+            <div class="rail-body">
+              <div id="lines"></div>
+              <div class="total"><span class="nm">Per Paycheck</span><span class="amt" id="perCheck">$0.00</span></div>
+              <div class="subtotal" id="annual">$0.00 per year</div>
+              <div class="employer-box">
+                <div class="h">Employer HSA Contribution</div>
+                <div class="v" id="empHsa">$0 / year</div>
+                <div style="font-size:11px;margin-top:2px;">Added to your HSA when you enroll in the medical plan — money toward you, not a cost.</div>
+              </div>
+              <button class="reset" onclick="restart()">Start over</button>
+            </div>
+          </div>
+          <div class="disc"><strong>Estimate &amp; guidance only.</strong> Coverage-level suggestions are based on your answers; account suggestions are general guidance, not personalized financial advice. Per-paycheck figures come from the 2026–2027 rate sheet at the stated employee-share percentages. Final deductions, contribution limits, and eligibility are confirmed in Paylocity, and all coverage is governed by the carrier certificates of coverage. Questions? Ask for Mitch or Matt at MDG Benefit Solutions — 888-282-1591.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">Odyssey Community School — 2026–2027 Employee Benefits · Prepared by MDG Benefit Solutions</div>
+</div>
+
+<script>
+  const GATE_CODE="MDG2026";
+  function checkGate(){
+    const v=document.getElementById("gateInput").value.trim();
+    if(v===GATE_CODE){
+      document.getElementById("gate").classList.add("hide");
+      document.getElementById("mainWrap").classList.remove("hide");
+    } else {
+      document.getElementById("gateErr").classList.add("show");
+      document.getElementById("gateInput").value="";
+      document.getElementById("gateInput").focus();
+    }
+  }
+  document.getElementById("gateInput").addEventListener("keydown",function(e){
+    if(e.key==="Enter"){ e.preventDefault(); checkGate(); }
+  });
+  document.getElementById("gateInput").focus();
+
+  const RATES={
+    medical:{tiers:[
+      {key:"EE",name:"Employee Only",c12:67.75,c10:83.88},
+      {key:"ES",name:"Employee + Spouse",c12:145.66,c10:180.34},
+      {key:"EC",name:"Employee + Child(ren)",c12:121.95,c10:150.99},
+      {key:"FAM",name:"Family",c12:182.93,c10:226.48}]},
+    dental:{tiers:[
+      {key:"EE",name:"Employee Only",c12:10.12,c10:12.53},
+      {key:"E1",name:"Employee + 1",c12:18.77,c10:23.24},
+      {key:"FAM",name:"Family",c12:31.86,c10:39.45}]}
+  };
+  const EMPLOYER_HSA=1000, HSA_SINGLE=4400, HSA_FAMILY=8750, DC_MAX=7500;
+
+  // map "who" answer -> dental tier (spouse OR children => E1)
+  const DENTAL_FROM_WHO={EE:"EE",ES:"E1",EC:"E1",FAM:"FAM"};
+
+  let answers={who:null,use:null,multi:new Set()};
+  let rec={med:null,den:null,hsa:0,dc:0,lp:0,volLife:false};
+  let state={group:12,med:null,den:null};
+
+  function fmt(n){return "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function fmt0(n){return "$"+Math.round(n).toLocaleString("en-US");}
+  function checks(){return state.group===12?26:21;}
+  function pf(){return state.group===12?"c12":"c10";}
+
+  // ---- Step 1 wiring ----
+  document.querySelectorAll("#qWho .choice").forEach(c=>c.onclick=()=>{
+    document.querySelectorAll("#qWho .choice").forEach(x=>x.classList.remove("sel"));
+    c.classList.add("sel"); answers.who=c.dataset.v; checkReady();
+  });
+  document.querySelectorAll("#qUse .choice").forEach(c=>c.onclick=()=>{
+    document.querySelectorAll("#qUse .choice").forEach(x=>x.classList.remove("sel"));
+    c.classList.add("sel"); answers.use=c.dataset.v; checkReady();
+  });
+  document.querySelectorAll("#qMulti .choice").forEach(c=>c.onclick=()=>{
+    const v=c.dataset.v;
+    if(answers.multi.has(v)){answers.multi.delete(v);c.classList.remove("sel");}
+    else{answers.multi.add(v);c.classList.add("sel");}
+  });
+  function checkReady(){
+    document.getElementById("toStep2").disabled=!(answers.who&&answers.use);
+  }
+
+  // ---- Build recommendation ----
+  function buildRec(){
+    rec.med=answers.who;
+    rec.den=DENTAL_FROM_WHO[answers.who];
+    // HSA suggestion tiers (starting points, clearly framed as suggestions)
+    if(answers.use==="save") rec.hsa=2000;
+    else if(answers.use==="high") rec.hsa=1500;
+    else if(answers.use==="some") rec.hsa=750;
+    else rec.hsa=0; // low: capture employer $ by enrolling; optional personal add
+    rec.dc = answers.multi.has("dc")?3000:0;
+    rec.lp = answers.multi.has("dv")?750:0;
+    rec.volLife = answers.multi.has("dep");
+  }
+
+  function recRender(){
+    buildRec();
+    const el=document.getElementById("recList"); el.innerHTML="";
+    const medName=RATES.medical.tiers.find(t=>t.key===rec.med).name;
+    const denName=RATES.dental.tiers.find(t=>t.key===rec.den).name;
+    const add=(plan,pick,why,muted)=>{
+      const d=document.createElement("div");
+      d.className="rec"+(muted?" muted":"");
+      d.innerHTML=`<div class="rh"><span class="plan">${plan}</span><span class="pick">${pick}</span></div><div class="why">${why}</div>`;
+      el.appendChild(d);
+    };
+    add("Medical — Anthem HDHP $3,000", medName,
+      "Odyssey offers one medical plan, set to cover "+coverText(answers.who)+". It's a High-Deductible Health Plan, so it comes with an HSA and a $1,000 employer contribution when you enroll.");
+    add("Dental — Essential Choice", denName,
+      answers.who==="EE"?"Covers just you.":"Covers you plus your dependents (dental is priced as Employee / Employee + 1 / Family).");
+    // HSA
+    let hsaWhy;
+    if(answers.use==="save") hsaWhy="You said you'd like to save tax-free — a suggested $2,000/yr starting point grows with you and rolls over every year.";
+    else if(answers.use==="high") hsaWhy="For planned ongoing costs, setting aside ~$1,500/yr in pre-tax dollars helps cover the deductible.";
+    else if(answers.use==="some") hsaWhy="For occasional visits and prescriptions, ~$750/yr is a reasonable pre-tax cushion.";
+    else hsaWhy="Even if you rarely use care, enrolling captures the free $1,000 employer contribution. A personal contribution is optional.";
+    add("Health Savings Account", rec.hsa>0?"~"+fmt0(rec.hsa)+" / yr (suggested)":"Capture $1,000 employer $",hsaWhy);
+    // DC FSA
+    if(answers.multi.has("dc")) add("Dependent Care FSA","~$3,000 / yr (suggested)","You pay for dependent care — pre-tax dollars here lower your taxable income. Adjust to your actual annual cost (up to $7,500).");
+    else add("Dependent Care FSA","Not suggested","You didn't flag dependent-care costs. Skip unless that changes.",true);
+    // LP FSA
+    if(answers.multi.has("dv")) add("Limited-Purpose Health FSA","~$750 / yr (suggested)","You expect dental/vision costs. This account stays HSA-compatible because it's limited to dental &amp; vision.");
+    else add("Limited-Purpose Health FSA","Optional","No dental/vision costs flagged — optional.",true);
+    // Voluntary life
+    if(rec.volLife) add("Voluntary Life &amp; AD&amp;D","Worth considering","Others depend on your income. Basic Life ($50k) is already included free; voluntary coverage adds more. Rates are age-based and quoted in Paylocity.");
+    else add("Voluntary Life &amp; AD&amp;D","Basic Life included","Your $50,000 employer-paid Basic Life is already in place at no cost.",true);
+  }
+  function coverText(w){return {EE:"just you",ES:"you and your spouse/partner",EC:"you and your child(ren)",FAM:"your whole family"}[w];}
+
+  // ---- Estimator ----
+  function buildOpts(planKey,containerId){
+    const plan=RATES[planKey], el=document.getElementById(containerId), cur=state[planKey==="medical"?"med":"den"], recKey=(planKey==="medical"?rec.med:rec.den);
+    el.innerHTML="";
+    const waive=document.createElement("div");
+    waive.className="opt"+(cur===null?" sel":""); waive.tabIndex=0; waive.setAttribute("role","radio");
+    waive.innerHTML='<div class="left"><span class="radioo"></span><span class="tname">Waive / decline</span></div><div class="cost"><span class="pp">$0.00</span><span class="u">no cost</span></div>';
+    waive.onclick=()=>sel(planKey,null); waive.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();sel(planKey,null);}};
+    el.appendChild(waive);
+    plan.tiers.forEach(t=>{
+      const o=document.createElement("div");
+      o.className="opt"+(cur===t.key?" sel":"")+(recKey===t.key?" rec-flag":"");
+      o.tabIndex=0; o.setAttribute("role","radio");
+      o.innerHTML=`<div class="left"><span class="radioo"></span><span class="tname">${t.name}</span>${recKey===t.key?'<span class="tag">Suggested</span>':''}</div>
+        <div class="cost"><span class="pp">${fmt(t[pf()])}</span><span class="u">per paycheck</span></div>`;
+      o.onclick=()=>sel(planKey,t.key); o.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();sel(planKey,t.key);}};
+      el.appendChild(o);
+    });
+  }
+  function sel(pk,k){ if(pk==="medical")state.med=k; else state.den=k; render(); }
+  function setGroup(g){ state.group=g; document.getElementById("g12").classList.toggle("on",g===12); document.getElementById("g10").classList.toggle("on",g===10); render(); }
+  function tierCost(pk){ const s=pk==="medical"?state.med:state.den; if(s===null)return 0; const t=RATES[pk].tiers.find(x=>x.key===s); return t?t[pf()]:0; }
+  function num(id){ const v=parseFloat(document.getElementById(id).value); return isNaN(v)||v<0?0:v; }
+
+  function render(){
+    buildOpts("medical","medOpts"); buildOpts("dental","denOpts");
+    document.getElementById("dcCap").classList.toggle("show",num("dcfsa")>DC_MAX);
+    if(num("dcfsa")>DC_MAX) document.getElementById("dcfsa").value=DC_MAX;
+    const famMed=["ES","EC","FAM"].includes(state.med);
+    const hsaMax=famMed?HSA_FAMILY:HSA_SINGLE;
+    const hc=document.getElementById("hsaCap");
+    hc.classList.toggle("show",num("hsa")>hsaMax);
+    hc.textContent=famMed?"Above the family-coverage IRS max ($8,750).":"Above the single-coverage IRS max ($4,400).";
+
+    const n=checks();
+    const medPP=tierCost("medical"), denPP=tierCost("dental");
+    const hsaPP=num("hsa")/n, dcPP=Math.min(num("dcfsa"),DC_MAX)/n, lpPP=num("lpfsa")/n;
+    const rows=[
+      {nm:"Medical premium",amt:medPP,always:true},
+      {nm:"Dental premium",amt:denPP,always:true},
+      {nm:"HSA contribution",amt:hsaPP,always:num("hsa")>0},
+      {nm:"Dependent Care FSA",amt:dcPP,always:num("dcfsa")>0},
+      {nm:"Limited-Purpose FSA",amt:lpPP,always:num("lpfsa")>0},
+    ];
+    const le=document.getElementById("lines"); le.innerHTML="";
+    rows.forEach(r=>{ if(!r.always)return; const d=document.createElement("div"); d.className="line"+(r.amt===0?" zero":""); d.innerHTML=`<span class="nm">${r.nm}</span><span class="amt">${fmt(r.amt)}</span>`; le.appendChild(d); });
+    const per=medPP+denPP+hsaPP+dcPP+lpPP;
+    document.getElementById("perCheck").textContent=fmt(per);
+    document.getElementById("annual").textContent=fmt(per*n)+" per year";
+    document.getElementById("railGroup").textContent=(state.group===12?"12-month":"10-month")+" · per paycheck";
+    document.getElementById("empHsa").textContent=fmt0(state.med!==null?EMPLOYER_HSA:0)+" / year";
+  }
+
+  // ---- Step navigation ----
+  function showStep(n){
+    for(let i=1;i<=3;i++){
+      document.getElementById("step"+i).classList.toggle("hide",i!==n);
+      const p=document.getElementById("pill"+i);
+      p.classList.toggle("on",i===n); p.classList.toggle("done",i<n);
+    }
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+  function goStep1(){ showStep(1); }
+  function goStep2(){ recRender(); showStep(2); }
+  function goStep3(){
+    // seed estimator from recommendation
+    state.med=rec.med; state.den=rec.den;
+    document.getElementById("hsa").value=rec.hsa;
+    document.getElementById("dcfsa").value=rec.dc;
+    document.getElementById("lpfsa").value=rec.lp;
+    // inline rec notes
+    setInline("recHsa", rec.hsa>0?("Suggested: ~"+fmt0(rec.hsa)+"/yr"):"Enrolling captures $1,000 employer $");
+    setInline("recDc", rec.dc>0?("Suggested: ~"+fmt0(rec.dc)+"/yr"):"");
+    setInline("recLp", rec.lp>0?("Suggested: ~"+fmt0(rec.lp)+"/yr"):"");
+    document.getElementById("volLifeHint").innerHTML = rec.volLife
+      ? "<b>Suggested to consider:</b> you flagged that others depend on your income. Voluntary Life &amp; AD&amp;D adds to your free $50k Basic Life — rates are age-based and quoted in Paylocity, so they aren't part of this estimate."
+      : "Voluntary Life &amp; AD&amp;D is available at employee cost — premiums are age-based and quoted in Paylocity, so they aren't part of this estimate.";
+    render(); showStep(3);
+  }
+  function setInline(id,txt){ const e=document.getElementById(id); if(!txt){e.classList.add("hide");return;} e.textContent=txt; e.classList.remove("hide"); }
+  function restart(){
+    answers={who:null,use:null,multi:new Set()};
+    document.querySelectorAll(".choice").forEach(c=>c.classList.remove("sel"));
+    state={group:state.group,med:null,den:null};
+    ["hsa","dcfsa","lpfsa"].forEach(id=>document.getElementById(id).value=0);
+    document.getElementById("toStep2").disabled=true;
+    showStep(1);
+  }
+
+  ["hsa","dcfsa","lpfsa"].forEach(id=>document.getElementById(id).addEventListener("input",render));
+</script>
+</body>
+</html>
